@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,24 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = 'django-insecure-q5q1@^dfyanw!1czj!9jbabhs$^f=1a6@)fyw#1s-s)=8c@$l)'
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', default='your secret key')
+SECRET_KEY = 'django-insecure-q5q1@^dfyanw!1czj!9jbabhs$^f=1a6@)fyw#1s-s)=8c@$l)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = True
+DEBUG = True
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
-
-
-ALLOWED_HOSTS = []
-
-RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -59,12 +46,17 @@ INSTALLED_APPS = [
     # rest framework apps!
     'rest_framework',
     'rest_framework.authtoken',
+    #cors permissions
     'corsheaders',
+    #authentication with google
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    #deploy railway
+    'taggit',
+    'django_social_share'
 ]
 
 SITE_ID = 1
@@ -168,7 +160,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 
@@ -234,10 +225,14 @@ WSGI_APPLICATION = 'turistApiRest.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-         default='mysql://devgroup:TouristApp1@@HOST:3007/NAME',
-         conn_max_age=600 
-    )
+    'default': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'touristapirest',
+    'USER': 'devgroup',
+    'PASSWORD': 'TouristApp1@' ,
+    'HOST': 'mysql',
+    'PORT': '3306',
+    }
 }
 
 
@@ -277,10 +272,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-if not DEBUG:    
-    
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_DIRS= [
+    os.path.join(BASE_DIR, "static"),
+]
 
 
 MEDIA_URL = '/files/'
@@ -317,4 +313,3 @@ ACCOUNT_EMAIL_REQUIRED=True
 ACCOUNT_EMAIL_VERIFICATION='none'  
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS =3
 ACCOUNT_CONFIRM_EMAIL_ON_GET= True
-
